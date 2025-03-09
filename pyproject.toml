@@ -1,0 +1,14 @@
+[project]
+name = "resume"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pulumi>=3.154.0",
+    "pulumi-aws>=6.71.0",
+    "ruff>=0.9.10",
+]
