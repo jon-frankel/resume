@@ -21,7 +21,7 @@ public_access_block = s3.BucketPublicAccessBlock(
     block_public_acls=False,
 )
 
-files = os.listdir("./app/public")
+files = os.listdir("../app/public")
 bucketObjects = []
 for file in files:
     mime_type, _ = mimetypes.guess_type(file)
@@ -29,7 +29,7 @@ for file in files:
         s3.BucketObject(
             file,
             bucket=bucket_name,
-            source=pulumi.FileAsset(f"./app/public/{file}"),
+            source=pulumi.FileAsset(f"../app/public/{file}"),
             acl="public-read",
             content_type=mime_type,
         )
