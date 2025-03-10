@@ -1,0 +1,159 @@
+html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1em;
+}
+
+body {
+    margin: auto;
+    width: 8.5in;
+    height: 11in;
+}
+
+h1 {
+    color: #FF4A00;
+    font-size: 4em;
+    line-height: 1em;
+    letter-spacing: -4px;
+    font-style: italic;
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: 300;
+}
+
+h2 {
+    margin: 10px 0;
+    text-align: center;
+}
+
+h2:before {
+    content: '\2014  ';
+}
+
+h2:after {
+    content: '  \2014';
+}
+
+h3 {
+    margin: 5px 0;
+    border-bottom: 1px solid;
+}
+
+h4 {
+    font-weight: normal;
+    font-style: italic;
+    margin: 5px 0 0 0;
+    display: inline-block;
+    width: 100%;
+}
+
+h5 {
+    font-weight: bold;
+    /*display: inline;*/
+    margin: 0;
+}
+
+header {
+    width: 100%;
+    padding-bottom: 3px;
+    border-bottom: 3px solid black;
+    margin-bottom: 10px;
+}
+
+header h1, header ul {
+    display: inline-block;
+    margin: 0;
+}
+
+header ul, header li {
+    list-style: none;
+}
+
+header ul {
+    float: right;
+}
+
+header li {
+    text-align: right;
+}
+
+ul {
+    display: inline-block;
+    padding-left: 2em;
+}
+
+section ul {
+    width: 100%;
+}
+
+h4 + ul {
+    margin-top: 0;
+}
+
+ul, p {
+    margin: 5px 0 10px 0;
+}
+
+ul.inline {
+    margin: 0;
+    padding: 0;
+}
+
+ul.inline li {
+    display: inline;
+}
+
+ul.inline li + li:before {
+    content: '  \2022\  ';
+}
+
+.left {
+    float: left;
+    text-align: left;
+}
+
+.right {
+    float: right;
+    text-align: right;
+}
+
+.half {
+    width: 47.5%;
+    float: left;
+}
+
+.half + .half {
+    margin-left: 5%;
+}
+
+/* specific */
+.about {
+    width: 80%;
+    margin: 0 10%;
+    text-align: center;
+    font-style: italic;
+    font-weight: 300;
+}
+
+.sidebar {
+    width: 25%;
+    float: left;
+}
+
+.experiece {
+    width: 70%;
+    float: right;
+}
+
+.highlights {
+    width: 95%;
+    padding: 10px 2.5%;
+    text-align: justify;
+    font-style: italic;
+    font-weight: 300;
+    display: inline-block
+}
+
+.page-break {
+    page-break-after: always;
+}
