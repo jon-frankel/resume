@@ -30,7 +30,6 @@ for file in files:
             file,
             bucket=bucket_name,
             source=pulumi.FileAsset(f"../app/public/{file}"),
-            acl="public-read",
             content_type=mime_type,
         )
     )
