@@ -4,15 +4,17 @@ import os
 import pulumi
 from pulumi_aws import s3
 
-bucket = s3.BucketV2("resume-bucket")
+stack_config = pulumi.Config()
+target_domain = stack_config.require("targetDomain")
+
+bucket = s3.BucketV2("resume-bucket", bucket=target_domain)
 bucket_name = bucket.id
 
 website = s3.BucketWebsiteConfigurationV2(
     "resume-website",
     bucket=bucket_name,
-    index_document={
-        "suffix": "index.html",
-    },
+    index_document={"suffix": "index.html"},
+    error_document={"key": "error.html"},
 )
 
 public_access_block = s3.BucketPublicAccessBlock(
