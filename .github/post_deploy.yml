@@ -1,0 +1,16 @@
+---
+
+name: Post Deployment
+run-name: ${{ github.actor }} running post deployment on ${{ github.event.deployment.environment }}
+
+on:
+  deployment_status:
+
+jobs:
+  # This job runs when a deployment is successful
+  post_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run post-deployment script
+        # print out payload from deployment event
+        run: echo "${{ toJson(github.event) }}"

@@ -60,4 +60,5 @@ bucket_policy = s3.BucketPolicy(
 )
 
 pulumi.export("bucket_name", bucket_name)
+pulumi.export("bucket_bucket", bucket.bucket)
 pulumi.export("website_url", website.website_endpoint)
