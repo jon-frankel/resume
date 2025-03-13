@@ -4,9 +4,7 @@ name: Post Deployment
 run-name: ${{ github.actor }} running post deployment on ${{ github.event.deployment.environment }}
 
 on:
-  push:
   deployment_status:
-  deployment:
   workflow_dispatch:
     inputs:
       some_input:
