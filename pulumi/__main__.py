@@ -61,7 +61,8 @@ bucket_policy = aws.s3.BucketPolicy(
     opts=pulumi.ResourceOptions(depends_on=[public_access_block]),
 )
 
-# Set up the lambda
+# Set up permissions for lambda
+lambda_name = "web-counter-lambda"
 assume_role = aws.iam.get_policy_document(
     statements=[
         {
@@ -71,12 +72,41 @@ assume_role = aws.iam.get_policy_document(
         }
     ]
 )
-lambda_name = "web-counter-lambda"
 iam_for_lambda = aws.iam.Role(
     f"{lambda_name}-role",
     name=f"{lambda_name}-role",
     assume_role_policy=assume_role.json,
 )
+
+# Give the lambda function permission to write logs
+log_group = aws.cloudwatch.LogGroup(
+    f"{lambda_name}-log-group",
+    name=f"/aws/lambda/{lambda_name}",
+    retention_in_days=14
+)
+log_policy_doc = aws.iam.get_policy_document(statements=[{
+    "effect": "Allow",
+    "actions": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+    ],
+    "resources": ["arn:aws:logs:*:*:*"],
+}])
+log_policy = aws.iam.Policy(
+    f"{lambda_name}-log-policy",
+    name=f"{lambda_name}-log-policy",
+    path="/",
+    description="IAM policy for lambda to write logs",
+    policy=log_policy_doc.json,
+)
+log_policy_attachment = aws.iam.RolePolicyAttachment(
+    f"{lambda_name}-log-policy-attachment",
+    role=iam_for_lambda.name,
+    policy_arn=log_policy.arn,
+)
+
+# Now create the lambda
 lambda_archive = archive.get_file(
     type="zip",
     source_file="../api/main.py",
@@ -91,7 +121,11 @@ lambda_function = aws.lambda_.Function(
     source_code_hash=lambda_archive.output_base64sha256,
     runtime=aws.lambda_.Runtime.PYTHON3D13,
     environment={"variables": {"BUCKET_NAME": bucket_name}},
+    logging_config={"log_format": "Text"},
+    opts=pulumi.ResourceOptions(depends_on=[log_policy_attachment, log_group]),
 )
+
+# And make it accessible via HTTP
 lambda_url = aws.lambda_.FunctionUrl(
     f"{lambda_name}-url",
     function_name=lambda_function.name,
