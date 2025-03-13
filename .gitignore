@@ -319,3 +319,4 @@ dist
 /pulumi/.pulumilocal/
 /volume/
 /pulumi/.pulumi/
+/.localstack/
