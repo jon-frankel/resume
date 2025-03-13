@@ -79,7 +79,7 @@ iam_for_lambda = aws.iam.Role(
 )
 lambda_archive = archive.get_file(
     type="zip",
-    source_file="api/main.py",
+    source_file="../api/main.py",
     output_path="api.zip",
 )
 lambda_function = aws.lambda_.Function(

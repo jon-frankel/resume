@@ -313,3 +313,6 @@ dist
 
 # IDE
 .idea
+
+# Custom
+/pulumi/api.zip
