@@ -1,21 +1,20 @@
 ---
 
-name: Post-deployment
+name: Deployment Status
 run-name: Deployment ${{ github.event.deployment_status.state }} on ${{ github.event.deployment.environment }} by ${{ github.actor }}
 
 on:
   deployment_status:
 
 jobs:
-  # This job runs when a deployment is successful
-  post_deploy:
+  status_update:
     runs-on: ubuntu-latest
     steps:
       - name: Event payload
         run: |
           echo "${{ toJson(github.event) }}"
       - name: Fail job if deployment failed
-        if: ${{ github.event.deployment_status.state != 'success' }}
+        if: ${{ github.event.deployment_status.state == 'failure' }}
         run: |
           echo "Deployment failed"
           exit 1
