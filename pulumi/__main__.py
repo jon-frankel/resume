@@ -92,9 +92,19 @@ lambda_function = aws.lambda_.Function(
     runtime=aws.lambda_.Runtime.PYTHON3D13,
     environment={"variables": {"BUCKET_NAME": bucket_name}},
 )
+lambda_url = aws.lambda_.FunctionUrl(
+    f"{lambda_name}-url",
+    function_name=lambda_function.name,
+    authorization_type="NONE",
+    cors={
+        "allow_origins": ["*"],
+        "allow_methods": ["*"],
+    }
+)
 
 pulumi.export("bucket_name", bucket_name)
 pulumi.export("bucket_bucket", bucket.bucket)
 pulumi.export("website_url", website.website_endpoint)
 pulumi.export("website_domain", website.website_domain)
 pulumi.export("lambda_name", lambda_function.name)
+pulumi.export("lambda_url", lambda_url.function_url)

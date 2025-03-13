@@ -1,25 +1,21 @@
 ---
 
-name: Post Deployment
-run-name: ${{ github.actor }} running post deployment on ${{ github.event.deployment.environment }}
+name: Post-deployment
+run-name: Deployment ${{ github.event.deployment_status.state }} on ${{ github.event.deployment.environment }} by ${{ github.actor }}
 
 on:
   deployment_status:
-  workflow_dispatch:
-    inputs:
-      some_input:
-        description: 'Some input'
-        required: true
-        default: 'default value'
 
 jobs:
   # This job runs when a deployment is successful
   post_deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Run post-deployment script
-        # print out payload from deployment event
-        run: echo "${{ toJson(github.event) }}"
-      - name: Print some_input
+      - name: Event payload
         run: |
-          echo "some_input: ${{ github.event.inputs.some_input }}"
+          @echo "${{ toJson(github.event) }}"
+      - name: Fail job if deployment failed
+        if: ${{ github.event.deployment_status.state != 'success' }}
+        run: |
+          echo "Deployment failed"
+          exit 1
