@@ -31,5 +31,5 @@ def handler(event=None, _context=None):
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",
         },
-        "body": json.dumps({"visits": visit_count, "timestamp": int(time.time())}),
+        "body": json.dumps({"visits": visit_count, "timestamp": f"{int(time.time())}"}),
     }
