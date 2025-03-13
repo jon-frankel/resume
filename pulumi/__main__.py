@@ -119,10 +119,25 @@ visits_table = aws.dynamodb.Table("visits-counter",
             name="updated_at",
             type="N",
         ),
+        aws.dynamodb.TableAttributeArgs(
+            name="visits",
+            type="N",
+        ),
     ],
     billing_mode="PAY_PER_REQUEST",
     hash_key="id",
-    range_key="updated_at",
+    global_secondary_indexes=[
+        aws.dynamodb.TableGlobalSecondaryIndexArgs(
+            name="updated_at-index",
+            hash_key="updated_at",
+            projection_type="ALL",
+        ),
+        aws.dynamodb.TableGlobalSecondaryIndexArgs(
+            name="visits-index",
+            hash_key="visits",
+            projection_type="ALL",
+        ),
+    ],
     ttl={
         "attribute_name": "ttl",
         "enabled": False,

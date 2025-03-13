@@ -7,16 +7,16 @@ dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ["TABLE_NAME"])
 
 
-def increment_counter(key = "web_counter"):
+def increment_counter(pk ="web_counter"):
     timestamp = int(time.time())
     try:
         response = table.update_item(
-            Key={"id": key, "updated_at": timestamp},
+            Key={"id": pk, "updated_at": timestamp},
             UpdateExpression="SET visits = if_not_exists(visits, :start) + :inc",
             ExpressionAttributeValues={":inc": 1, ":start": 0},
             ReturnValues="UPDATED_NEW",
         )
-        return {"status": "success", "visits": response["Attributes"]["visits"]}
+        return {"status": "success", "visits": f"{response["Attributes"]["visits"]}"}
     except Exception as e:
         print(f"Error incrementing counter: {str(e)}")
         return {"status": "error", "message": "Could not increment counter"}
