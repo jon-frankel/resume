@@ -107,73 +107,73 @@ log_policy_attachment = aws.iam.RolePolicyAttachment(
     policy_arn=log_policy.arn,
 )
 
-# DynamoDB table for visit counter
-visits_table = aws.dynamodb.Table("visits-counter",
-    name="visits-counter",
-    attributes=[
-        aws.dynamodb.TableAttributeArgs(
-            name="id",
-            type="S",
-        ),
-        aws.dynamodb.TableAttributeArgs(
-            name="updated_at",
-            type="N",
-        ),
-        aws.dynamodb.TableAttributeArgs(
-            name="visits",
-            type="N",
-        ),
-    ],
-    billing_mode="PAY_PER_REQUEST",
-    hash_key="id",
-    global_secondary_indexes=[
-        aws.dynamodb.TableGlobalSecondaryIndexArgs(
-            name="updated_at-index",
-            hash_key="updated_at",
-            projection_type="ALL",
-        ),
-        aws.dynamodb.TableGlobalSecondaryIndexArgs(
-            name="visits-index",
-            hash_key="visits",
-            projection_type="ALL",
-        ),
-    ],
-    ttl={
-        "attribute_name": "ttl",
-        "enabled": False,
-    }
-)
-
-# Add DynamoDB permissions to Lambda role
-dynamodb_policy_doc = aws.iam.get_policy_document(
-    statements=[
-        {
-            "effect": "Allow",
-            "actions": [
-                "dynamodb:BatchGetItem",
-                "dynamodb:GetItem",
-                "dynamodb:Query",
-                "dynamodb:Scan",
-                "dynamodb:UpdateItem",
-            ],
-            "resources": [visits_table.arn],
-        }
-    ]
-)
-
-dynamodb_policy = aws.iam.Policy(
-    f"{lambda_name}-dynamodb-policy",
-    name=f"{lambda_name}-dynamodb-policy",
-    path="/",
-    description="IAM policy for lambda to access DynamoDB",
-    policy=dynamodb_policy_doc.json,
-)
-
-dynamodb_policy_attachment = aws.iam.RolePolicyAttachment(
-    f"{lambda_name}-dynamodb-policy-attachment",
-    role=lambda_role.name,
-    policy_arn=dynamodb_policy.arn,
-)
+# # DynamoDB table for visit counter
+# visits_table = aws.dynamodb.Table("visits-counter",
+#     name="visits-counter",
+#     attributes=[
+#         aws.dynamodb.TableAttributeArgs(
+#             name="id",
+#             type="S",
+#         ),
+#         aws.dynamodb.TableAttributeArgs(
+#             name="updated_at",
+#             type="N",
+#         ),
+#         aws.dynamodb.TableAttributeArgs(
+#             name="visits",
+#             type="N",
+#         ),
+#     ],
+#     billing_mode="PAY_PER_REQUEST",
+#     hash_key="id",
+#     global_secondary_indexes=[
+#         aws.dynamodb.TableGlobalSecondaryIndexArgs(
+#             name="updated_at-index",
+#             hash_key="updated_at",
+#             projection_type="ALL",
+#         ),
+#         aws.dynamodb.TableGlobalSecondaryIndexArgs(
+#             name="visits-index",
+#             hash_key="visits",
+#             projection_type="ALL",
+#         ),
+#     ],
+#     ttl={
+#         "attribute_name": "ttl",
+#         "enabled": False,
+#     }
+# )
+#
+# # Add DynamoDB permissions to Lambda role
+# dynamodb_policy_doc = aws.iam.get_policy_document(
+#     statements=[
+#         {
+#             "effect": "Allow",
+#             "actions": [
+#                 "dynamodb:BatchGetItem",
+#                 "dynamodb:GetItem",
+#                 "dynamodb:Query",
+#                 "dynamodb:Scan",
+#                 "dynamodb:UpdateItem",
+#             ],
+#             "resources": [visits_table.arn],
+#         }
+#     ]
+# )
+#
+# dynamodb_policy = aws.iam.Policy(
+#     f"{lambda_name}-dynamodb-policy",
+#     name=f"{lambda_name}-dynamodb-policy",
+#     path="/",
+#     description="IAM policy for lambda to access DynamoDB",
+#     policy=dynamodb_policy_doc.json,
+# )
+#
+# dynamodb_policy_attachment = aws.iam.RolePolicyAttachment(
+#     f"{lambda_name}-dynamodb-policy-attachment",
+#     role=lambda_role.name,
+#     policy_arn=dynamodb_policy.arn,
+# )
 
 # Now create the lambda
 lambda_archive = archive.get_file(
@@ -191,7 +191,7 @@ lambda_function = aws.lambda_.Function(
     runtime=aws.lambda_.Runtime.PYTHON3D13,
     environment={"variables": {
         "BUCKET_NAME": bucket_name,
-        "TABLE_NAME": visits_table.name,
+        # "TABLE_NAME": visits_table.name,
     }},
     logging_config={"log_format": "Text"},
     opts=pulumi.ResourceOptions(depends_on=[log_policy_attachment, log_group]),
@@ -214,4 +214,4 @@ pulumi.export("website_url", website.website_endpoint)
 pulumi.export("website_domain", website.website_domain)
 pulumi.export("lambda_name", lambda_function.name)
 pulumi.export("lambda_url", lambda_url.function_url)
-pulumi.export("visits_table_name", visits_table.name)
+# pulumi.export("visits_table_name", visits_table.name)
