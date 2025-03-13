@@ -72,7 +72,7 @@ assume_role = aws.iam.get_policy_document(
         }
     ]
 )
-iam_for_lambda = aws.iam.Role(
+lambda_role = aws.iam.Role(
     f"{lambda_name}-role",
     name=f"{lambda_name}-role",
     assume_role_policy=assume_role.json,
@@ -102,7 +102,7 @@ log_policy = aws.iam.Policy(
 )
 log_policy_attachment = aws.iam.RolePolicyAttachment(
     f"{lambda_name}-log-policy-attachment",
-    role=iam_for_lambda.name,
+    role=lambda_role.name,
     policy_arn=log_policy.arn,
 )
 
@@ -116,7 +116,7 @@ lambda_function = aws.lambda_.Function(
     lambda_name,
     code=pulumi.FileArchive("api.zip"),
     name=lambda_name,
-    role=iam_for_lambda.arn,
+    role=lambda_role.arn,
     handler="main.handler",
     source_code_hash=lambda_archive.output_base64sha256,
     runtime=aws.lambda_.Runtime.PYTHON3D13,
@@ -136,10 +136,65 @@ lambda_url = aws.lambda_.FunctionUrl(
     }
 )
 
+# DynamoDB table for visit counter
+visits_table = aws.dynamodb.Table("visits-counter",
+    attributes=[
+        aws.dynamodb.TableAttributeArgs(
+            name="id",
+            type="S",
+        ),
+        aws.dynamodb.TableAttributeArgs(
+            name="updated_at",
+            type="N",
+        ),
+    ],
+    billing_mode="PAY_PER_REQUEST",
+    hash_key="id",
+    range_key="updated_at",
+    ttl={
+        "attribute_name": "ttl",
+        "enabled": False,
+    }
+)
+
+# Add DynamoDB permissions to Lambda role
+dynamodb_policy_doc = aws.iam.get_policy_document(
+    statements=[
+        {
+            "effect": "Allow",
+            "actions": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:UpdateItem",
+            ],
+            "resources": [visits_table.arn],
+        }
+    ]
+)
+
+dynamodb_policy = aws.iam.Policy(
+    f"{lambda_name}-dynamodb-policy",
+    name=f"{lambda_name}-dynamodb-policy",
+    path="/",
+    description="IAM policy for lambda to access DynamoDB",
+    policy=dynamodb_policy_doc.json,
+)
+
+dynamodb_policy_attachment = aws.iam.RolePolicyAttachment(
+    f"{lambda_name}-dynamodb-policy-attachment",
+    role=lambda_role.name,
+    policy_arn=dynamodb_policy.arn,
+)
+
+# Add table name to lambda environment
+lambda_function.environment["variables"]["TABLE_NAME"] = visits_table.name
+
 pulumi.export("bucket_name", bucket_name)
 pulumi.export("bucket_bucket", bucket.bucket)
 pulumi.export("website_url", website.website_endpoint)
 pulumi.export("website_domain", website.website_domain)
 pulumi.export("lambda_name", lambda_function.name)
 pulumi.export("lambda_url", lambda_url.function_url)
-pulumi.export("log_policy_attachment", log_policy_attachment.policy_arn)
+pulumi.export("visits_table_name", visits_table.name)
