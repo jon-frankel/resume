@@ -109,6 +109,7 @@ log_policy_attachment = aws.iam.RolePolicyAttachment(
 
 # DynamoDB table for visit counter
 visits_table = aws.dynamodb.Table("visits-counter",
+    name="visits-counter",
     attributes=[
         aws.dynamodb.TableAttributeArgs(
             name="id",
