@@ -5,15 +5,15 @@ import boto3
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ["TABLE_NAME"])
+timestamp = int(time.time())
 
 
 def increment_counter(pk ="web_counter"):
-    timestamp = int(time.time())
     try:
         response = table.update_item(
-            Key={"id": pk, "updated_at": timestamp},
-            UpdateExpression="SET visits = if_not_exists(visits, :start) + :inc",
-            ExpressionAttributeValues={":inc": 1, ":start": 0},
+            Key={"id": pk},
+            UpdateExpression="SET visits = if_not_exists(visits, :start) + :inc, updated_at = :timestamp",
+            ExpressionAttributeValues={":inc": 1, ":start": 0, ":timestamp": timestamp},
             ReturnValues="UPDATED_NEW",
         )
         return {"status": "success", "visits": f"{response["Attributes"]["visits"]}"}
@@ -31,5 +31,5 @@ def handler(event=None, _context=None):
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",
         },
-        "body": json.dumps({"visits": visit_count, "timestamp": f"{int(time.time())}"}),
+        "body": json.dumps({"visits": visit_count, "timestamp": timestamp}),
     }
