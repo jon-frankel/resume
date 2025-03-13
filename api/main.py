@@ -1,6 +1,2 @@
-def main():
-    print("Hello from api!")
-
-
-if __name__ == "__main__":
-    main()
+def handler(event=None, context=None):
+    return {"statusCode": 200, "body": "Hello, World!"}

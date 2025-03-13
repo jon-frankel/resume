@@ -8,7 +8,9 @@ dependencies = []
 
 [dependency-groups]
 dev = [
+    "boto3>=1.37.11",
     "pulumi>=3.154.0",
+    "pulumi-archive>=0.3.1",
     "pulumi-aws>=6.71.0",
     "ruff>=0.9.10",
 ]
