@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Event payload
         run: |
-          @echo "${{ toJson(github.event) }}"
+          echo "${{ toJson(github.event) }}"
       - name: Fail job if deployment failed
         if: ${{ github.event.deployment_status.state != 'success' }}
         run: |
