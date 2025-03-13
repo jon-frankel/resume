@@ -316,3 +316,6 @@ dist
 
 # Custom
 /pulumi/api.zip
+/pulumi/.pulumilocal/
+/volume/
+/pulumi/.pulumi/
