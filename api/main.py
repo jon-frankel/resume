@@ -3,6 +3,8 @@ import time
 import json
 import boto3
 
+os.environ['AWS_DEFAULT_REGION'] = os.environ['AWS_DEFAULT_REGION'] \
+    if 'AWS_DEFAULT_REGION' in os.environ['AWS_DEFAULT_REGION'] else 'us-east-1'
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ["TABLE_NAME"])
 timestamp = int(time.time())
