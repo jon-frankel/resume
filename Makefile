@@ -33,5 +33,6 @@ pytest:
 	pulumi login --local && \
 	pulumi stack select local && \
 	export LAMBDA_URL=$$(pulumi stack output lambda_url) && \
+	echo $$LAMBDA_URL && \
 	cd .. && \
 	uv run pytest
