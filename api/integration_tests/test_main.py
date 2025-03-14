@@ -1,6 +1,5 @@
 import os
 
-import boto3
 import requests
 
 
@@ -27,9 +26,3 @@ def get_response():
     assert "timestamp" in data
     visits = visit_data["visits"]
     return visits
-
-
-client = boto3.client("lambda")
-
-def invoke_lambda():
-    ...
