@@ -16,7 +16,7 @@ docker-destroy: ## Stop and remove localstack
 	docker compose rm localstack
 	rm -rf .localstack
 
-pulumi-up: ## Deploy pulumi stack
+pulumi-up: ## Deploy pulumi stack to localstack
 	cd pulumi && \
 	export PULUMI_CONFIG_PASSPHRASE=local && \
 	export PULUMI_BACKEND_URL=file://.pulumi && \
