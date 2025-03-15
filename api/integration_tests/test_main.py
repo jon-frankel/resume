@@ -21,8 +21,6 @@ def get_response():
     assert req.status_code == 200
     data = req.json()
     assert "visits" in data
-    visit_data = data["visits"]
-    assert "visits" in visit_data
+    visits = data["visits"]
     assert "timestamp" in data
-    visits = visit_data["visits"]
     return visits

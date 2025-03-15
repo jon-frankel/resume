@@ -16,14 +16,23 @@ def increment_counter(pk ="web_counter"):
             ExpressionAttributeValues={":inc": 1, ":start": 0, ":timestamp": timestamp},
             ReturnValues="UPDATED_NEW",
         )
-        return {"status": "success", "visits": f"{response["Attributes"]["visits"]}"}
+        return {
+            "status": "success",
+            "visits": f"{response["Attributes"]["visits"]}",
+            "timestamp": timestamp,
+        }
     except Exception as e:
         print(f"Error incrementing counter: {str(e)}")
-        return {"status": "error", "message": "Could not increment counter"}
+        return {
+            "status": "error",
+            "message": "Could not increment counter",
+            "visits": None,
+            "timestamp": timestamp,
+        }
 
 
 def handler(event=None, _context=None):
-    visit_count = increment_counter()
+    response_body = increment_counter()
 
     return {
         "statusCode": 200,
@@ -31,5 +40,5 @@ def handler(event=None, _context=None):
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",
         },
-        "body": json.dumps({"visits": visit_count, "timestamp": timestamp}),
+        "body": json.dumps(response_body),
     }
