@@ -149,7 +149,7 @@ lambda_url = aws.lambda_.FunctionUrl(
     function_name=lambda_function.name,
     authorization_type="NONE",
     cors={
-        "allow_origins": [f"https://{target_domain}"],
+        "allow_origins": [],  # [f"https://{target_domain}"],
         "allow_methods": ["*"],
     }
 )
