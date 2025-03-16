@@ -35,16 +35,12 @@ pulumi-destroy: ## Destroy pulumi stack
 	rm -rf .pulumi
 	# Don't do pulumi stack delete because we want to keep the yaml file
 
-pytest: ## Run integration tests
-	cd pulumi && \
-	export PULUMI_CONFIG_PASSPHRASE=local && \
-	export PULUMI_BACKEND_URL=file://.pulumi && \
-	pulumi login --local && \
-	pulumi stack select local && \
-	export LAMBDA_URL=$$(pulumi stack output lambda_url) && \
-	echo $$LAMBDA_URL && \
-	cd .. && \
-	uv run pytest
+launch: docker-up pulumi-up ## Launch the app
+	@echo "App is running at http://localhost 🚀"
+	@open http://localhost
+
+destroy: pulumi-destroy docker-destroy ## Gracefully destroy all resources
+	@echo "Destroyed all resources 💥"
 
 start-dev: ## Start the front end app dev server
 	cd pulumi && \
@@ -57,9 +53,20 @@ start-dev: ## Start the front end app dev server
 	cd .. && \
 	pnpm start
 
-launch: docker-up pulumi-up ## Launch the app
-	@echo "App is running at http://localhost 🚀"
-	@open http://localhost
+pytest: ## Run integration tests
+	cd pulumi && \
+	export PULUMI_CONFIG_PASSPHRASE=local && \
+	export PULUMI_BACKEND_URL=file://.pulumi && \
+	pulumi login --local && \
+	pulumi stack select local && \
+	export LAMBDA_URL=$$(pulumi stack output lambda_url) && \
+	echo $$LAMBDA_URL && \
+	cd .. && \
+	uv run pytest
 
-destroy: pulumi-destroy docker-destroy ## Gracefully destroy all resources
-	@echo "Destroyed all resources 💥"
+test-integration: pytest ## Run integration tests
+
+playwright: ## Run end-to-end tests
+	pnpm exec playwright test
+
+test-e2e: playwright

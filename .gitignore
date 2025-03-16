@@ -323,3 +323,9 @@ dist
 
 # Compiled code
 /public/main.js
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

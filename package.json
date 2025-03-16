@@ -5,8 +5,7 @@
   "private": true,
   "scripts": {
     "build": "webpack",
-    "start": "webpack serve --open",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "webpack serve --open"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +16,7 @@
     "pnpm": ">=10.6.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.51.0",
     "@types/node": "^22.13.10",
     "@types/webpack": "^5.28.5",
     "ts-loader": "^9.5.2",
