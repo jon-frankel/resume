@@ -196,7 +196,7 @@ bucket_policy = aws.s3.BucketPolicy(
 )
 
 def upload_files(api_url):
-    build_command = f"export LAMBDA_URL={api_url} && cd .. && npx webpack build --force"
+    build_command = f"export LAMBDA_URL={api_url} && cd .. && pnpm install && pnpm build"
     print(f"Running build command: {build_command}")
     exit_status = os.system(build_command)
     if exit_status > 0:
