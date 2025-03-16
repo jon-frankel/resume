@@ -36,11 +36,6 @@ const config: webpack.Configuration = {
     ],
     devServer: {
         static: './public',
-        headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-            "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
-        },
         // Note: localstack CORS config does not work with any port other than 80
         port: 80,
     },
