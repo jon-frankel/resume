@@ -8,59 +8,6 @@ import pulumi
 
 stack_config = pulumi.Config()
 target_domain = stack_config.require("targetDomain")
-
-bucket = aws.s3.BucketV2("resume-bucket", bucket=target_domain)
-bucket_name = bucket.id
-
-website = aws.s3.BucketWebsiteConfigurationV2(
-    "resume-website",
-    bucket=bucket_name,
-    index_document={"suffix": "index.html"},
-    error_document={"key": "error.html"},
-)
-
-public_access_block = aws.s3.BucketPublicAccessBlock(
-    "resume-public-access-block",
-    bucket=bucket_name,
-    block_public_acls=False,
-)
-
-files = os.listdir("../public")
-bucketObjects = []
-for file in files:
-    mime_type, _ = mimetypes.guess_type(file)
-    bucketObjects.append(
-        aws.s3.BucketObject(
-            file,
-            bucket=bucket_name,
-            source=pulumi.FileAsset(f"../public/{file}"),
-            content_type=mime_type,
-        )
-    )
-
-public_read_policy = pulumi.Output.json_dumps(
-    {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Effect": "Allow",
-                "Principal": "*",
-                "Action": ["s3:GetObject"],
-                "Resource": [
-                    pulumi.Output.format("arn:aws:s3:::{0}/*", bucket_name),
-                ],
-            }
-        ],
-    }
-)
-
-bucket_policy = aws.s3.BucketPolicy(
-    "bucket-policy",
-    bucket=bucket_name,
-    policy=public_read_policy,
-    opts=pulumi.ResourceOptions(depends_on=[public_access_block]),
-)
-
 lambda_name = "web-counter-lambda"
 
 # Lambda role
@@ -190,7 +137,6 @@ lambda_function = aws.lambda_.Function(
     source_code_hash=lambda_archive.output_base64sha256,
     runtime=aws.lambda_.Runtime.PYTHON3D13,
     environment={"variables": {
-        "BUCKET_NAME": bucket_name,
         "TABLE_NAME": visits_table.name,
     }},
     logging_config={"log_format": "Text"},
@@ -207,6 +153,70 @@ lambda_url = aws.lambda_.FunctionUrl(
         "allow_methods": ["*"],
     }
 )
+
+## Static site
+
+bucket = aws.s3.BucketV2("resume-bucket", bucket=target_domain)
+bucket_name = bucket.id
+
+website = aws.s3.BucketWebsiteConfigurationV2(
+    "resume-website",
+    bucket=bucket_name,
+    index_document={"suffix": "index.html"},
+    error_document={"key": "error.html"},
+)
+
+public_access_block = aws.s3.BucketPublicAccessBlock(
+    "resume-public-access-block",
+    bucket=bucket_name,
+    block_public_acls=False,
+)
+
+public_read_policy = pulumi.Output.json_dumps(
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": ["s3:GetObject"],
+                "Resource": [
+                    pulumi.Output.format("arn:aws:s3:::{0}/*", bucket_name),
+                ],
+            }
+        ],
+    }
+)
+
+bucket_policy = aws.s3.BucketPolicy(
+    "bucket-policy",
+    bucket=bucket_name,
+    policy=public_read_policy,
+    opts=pulumi.ResourceOptions(depends_on=[public_access_block]),
+)
+
+def upload_files(api_url):
+    build_command = f"export LAMBDA_URL={api_url} && cd .. && pnpm build"
+    print(f"Running build command: {build_command}")
+    exit_status = os.system(build_command)
+    if exit_status > 0:
+        raise Exception("Build failed")
+
+    files = os.listdir("../public")
+    bucket_objects = []
+    for file in files:
+        mime_type, _ = mimetypes.guess_type(file)
+        bucket_objects.append(
+            aws.s3.BucketObject(
+                file,
+                bucket=bucket_name,
+                source=pulumi.FileAsset(f"../public/{file}"),
+                content_type=mime_type,
+            )
+        )
+
+# Once the lambda is created, we can use its URL to build the app and upload it to the bucket
+lambda_url.function_url.apply(upload_files)
 
 pulumi.export("bucket_name", bucket_name)
 pulumi.export("bucket_bucket", bucket.bucket)
