@@ -157,3 +157,11 @@ ul.inline li + li:before {
 .page-break {
     page-break-after: always;
 }
+
+@media print
+{
+    .no-print, .no-print *
+    {
+        display: none !important;
+    }
+}
