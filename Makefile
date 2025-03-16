@@ -45,3 +45,25 @@ pytest: ## Run integration tests
 	echo $$LAMBDA_URL && \
 	cd .. && \
 	uv run pytest
+
+build-app: ## Build the front end app
+	cd pulumi && \
+	export PULUMI_CONFIG_PASSPHRASE=local && \
+	export PULUMI_BACKEND_URL=file://.pulumi && \
+	pulumi login --local && \
+	pulumi stack select local && \
+	export LAMBDA_URL=$$(pulumi stack output lambda_url) && \
+	echo $$LAMBDA_URL && \
+	cd .. && \
+	pnpm build
+
+start-app: ## Start the front end app dev server
+	cd pulumi && \
+	export PULUMI_CONFIG_PASSPHRASE=local && \
+	export PULUMI_BACKEND_URL=file://.pulumi && \
+	pulumi login --local && \
+	pulumi stack select local && \
+	export LAMBDA_URL=$$(pulumi stack output lambda_url) && \
+	echo $$LAMBDA_URL && \
+	cd .. && \
+	pnpm start

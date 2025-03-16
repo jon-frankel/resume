@@ -320,3 +320,6 @@ dist
 /volume/
 /pulumi/.pulumi/
 /.localstack/
+
+# Compiled code
+/public/main.js
