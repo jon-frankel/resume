@@ -46,7 +46,7 @@ pytest: ## Run integration tests
 	cd .. && \
 	uv run pytest
 
-start-app: ## Start the front end app dev server
+start-dev: ## Start the front end app dev server
 	cd pulumi && \
 	export PULUMI_CONFIG_PASSPHRASE=local && \
 	export PULUMI_BACKEND_URL=file://.pulumi && \
@@ -57,5 +57,9 @@ start-app: ## Start the front end app dev server
 	cd .. && \
 	pnpm start
 
-start-caddy: ## Start the Caddy file server
-	caddy file-server --root ./public
+launch: docker-up pulumi-up ## Launch the app
+	@echo "App is running at http://localhost 🚀"
+	@open http://localhost
+
+destroy: pulumi-destroy docker-destroy ## Gracefully destroy all resources
+	@echo "Destroyed all resources 💥"
