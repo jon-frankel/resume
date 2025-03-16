@@ -36,8 +36,7 @@ const config: webpack.Configuration = {
     ],
     devServer: {
         static: './public',
-        // Note: localstack CORS config does not work with any port other than 80
-        port: 80,
+        port: 8080,
     },
     mode: 'production',
 };
