@@ -32,13 +32,22 @@ def increment_counter(pk ="web_counter"):
 
 
 def handler(event=None, _context=None):
+    method = event["requestContext"]["http"]["method"]
+    if method == "OPTIONS":
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Content-Type": "application/json",
+            },
+            "body": json.dumps({"status": "success"}),
+        }
+
     response_body = increment_counter()
 
     return {
         "statusCode": 200,
         "headers": {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
         },
         "body": json.dumps(response_body),
     }
