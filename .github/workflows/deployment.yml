@@ -28,14 +28,16 @@ jobs:
         run: |
           if [[ $GITHUB_REF_NAME == 'main' ]]; then
             echo "URL=https://resume-staging.frankel.dev" >> "$GITHUB_ENV"
+            echo "it's main"
           elif [[ $GITHUB_REF_NAME == 'prod' ]]; then
             echo "URL=https://resume.frankel.dev" >> "$GITHUB_ENV"
+            echo "it's prod"
           fi
 
       - name: Show what we got
         run: |
-          echo "URL=$URL";
-          echo "GITHUB_REF_NAME=$GITHUB_REF_NAME"
+          echo URL $URL;
+          echo GITHUB_REF_NAME $GITHUB_REF_NAME
 
       - name: Checkout repository
         uses: actions/checkout@v4
