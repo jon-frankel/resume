@@ -9,6 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    continue-on-error: false
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -50,10 +51,30 @@ jobs:
         run: make pytest
 
       # Run end-to-end tests
-      - name: Install Playwright Browsers
-        run: pnpm exec playwright install --with-deps
+#      - name: Install Playwright Browsers
+#        run: pnpm exec playwright install --with-deps
+
+      - name: Get installed Playwright version
+        id: playwright-version
+        run: echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package.json').dependencies['@playwright/test'])")" >> $GITHUB_ENV
+
+      - name: Cache playwright binaries
+        uses: actions/cache@v3
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+
+      - run: pnpx playwright install --with-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+
+      - run: pnpx playwright install-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+
       - name: Run Playwright tests
         run: pnpm exec playwright test
+
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
