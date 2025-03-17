@@ -1,5 +1,8 @@
 on:
-  push: [main]
+  push:
+    branches:
+      - main
+      - prod
 
 jobs:
   test_var:
