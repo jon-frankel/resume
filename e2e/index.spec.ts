@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 const host = process.env.URL ?? 'http://localhost';
+console.log("Testing host: ", host);
 
 test('page contains name', async ({ page }) => {
   await page.goto(host);
