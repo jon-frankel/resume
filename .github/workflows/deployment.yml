@@ -24,20 +24,13 @@ jobs:
     needs: status_update
     if: ${{ github.event.deployment_status.state == 'success' }}
     steps:
-      - name: Set environment for branch
-        run: |
-          if [[ $GITHUB_REF_NAME == 'main' ]]; then
-            echo "URL=https://resume-staging.frankel.dev" >> "$GITHUB_ENV"
-            echo "it's main"
-          elif [[ $GITHUB_REF_NAME == 'prod' ]]; then
-            echo "URL=https://resume.frankel.dev" >> "$GITHUB_ENV"
-            echo "it's prod"
-          fi
+      - name: Set URL for main
+        if: ${{ github.ref_name == 'main' }}
+        run: echo "URL=https://resume-staging.frankel.dev" >> "$GITHUB_ENV"
 
-      - name: Show what we got
-        run: |
-          echo URL $URL;
-          echo GITHUB_REF_NAME $GITHUB_REF_NAME
+      - name: Set URL for prod
+        if: ${{ github.ref_name == 'prod' }}
+        run: echo "URL=https://resume.frankel.dev" >> "$GITHUB_ENV"
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -53,7 +46,7 @@ jobs:
       - run: pnpx playwright install --with-deps
 
       - name: Run Playwright tests
-        run: URL=$URL pnpm exec playwright test
+        run: pnpm exec playwright test
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
