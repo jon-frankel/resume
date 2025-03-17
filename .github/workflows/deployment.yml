@@ -25,11 +25,11 @@ jobs:
     if: ${{ github.event.deployment_status.state == 'success' }}
     steps:
       - name: Set URL for main
-        if: ${{ github.ref_name == 'main' }}
+        if: ${{ github.event.deployment.environment == 'wikiterra/jon-frankel-resume/staging' }}
         run: echo "URL=https://resume-staging.frankel.dev" >> "$GITHUB_ENV"
 
       - name: Set URL for prod
-        if: ${{ github.ref_name == 'prod' }}
+        if: ${{ github.event.deployment.environment == 'wikiterra/jon-frankel-resume/production' }}
         run: echo "URL=https://resume.frankel.dev" >> "$GITHUB_ENV"
 
       - name: Checkout repository
