@@ -6,9 +6,6 @@ run-name: Deployment ${{ github.event.deployment_status.state }} on ${{ github.e
 on:
   deployment_status:
 
-env:
-  URL: ${{ github.ref_name == 'main' && 'https://resume-staging.frankel.dev' || github.ref_name == 'prod' && 'https://resume.frankel.dev' || '' }}
-
 jobs:
   status_update:
     runs-on: ubuntu-latest
@@ -25,7 +22,16 @@ jobs:
   smoke-test:
     runs-on: ubuntu-latest
     needs: status_update
+    if: ${{ github.event.deployment_status.state == 'success' }}
     steps:
+      - name: Set environment for branch
+        run: |
+          if [[ $GITHUB_REF_NAME == 'main' ]]; then
+            echo "URL=https://resume-staging.frankel.dev" >> "$GITHUB_ENV"
+          elif [[ $GITHUB_REF_NAME == 'prod' ]]; then
+            echo "URL=https://resume.frankel.dev" >> "$GITHUB_ENV"
+          fi
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -56,7 +62,7 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
 
       - name: Run Playwright tests
-        run: URL=$URL pnpm exec playwright test
+        run: pnpm exec playwright test
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}

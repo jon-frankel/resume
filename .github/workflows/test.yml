@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: ['*']
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -50,23 +54,23 @@ jobs:
       - name: Run integration tests
         run: make pytest
 
-      - name: Get installed Playwright version
-        id: playwright-version
-        run: echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package.json').dependencies['@playwright/test'])")" >> $GITHUB_ENV
+#      - name: Get installed Playwright version
+#        id: playwright-version
+#        run: echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package.json').dependencies['@playwright/test'])")" >> $GITHUB_ENV
 
-      - name: Cache playwright binaries
-        uses: actions/cache@v3
-        id: playwright-cache
-        with:
-          path: |
-            ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+#      - name: Cache playwright binaries
+#        uses: actions/cache@v3
+#        id: playwright-cache
+#        with:
+#          path: |
+#            ~/.cache/ms-playwright
+#          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
 
       - run: pnpx playwright install --with-deps
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
+#        if: steps.playwright-cache.outputs.cache-hit != 'true'
 
-      - run: pnpx playwright install-deps
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
+#      - run: pnpx playwright install-deps
+#        if: steps.playwright-cache.outputs.cache-hit != 'true'
 
       - name: Run Playwright tests
         run: pnpm exec playwright test
