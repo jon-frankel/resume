@@ -4,7 +4,9 @@ version = "0.1.0"
 description = "Jonathan Frankel's Resume"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "boto3-stubs~=1.37.11",
+]
 
 [dependency-groups]
 dev = [

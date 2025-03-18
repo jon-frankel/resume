@@ -12,14 +12,7 @@ services:
       # localstack has a weird bug where the origin you want allowed needs to be in the middle of a list.
       # It can't be first or last!
       - EXTRA_CORS_ALLOWED_ORIGINS="does-not-matter,http://localhost,http://localhost:8080,also-does-not-matter"
+      - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN}
     volumes:
       - "${LOCALSTACK_VOLUME_DIR:-./.localstack}:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
-
-  caddy:
-    image: caddy:2.9.1-alpine
-    restart: unless-stopped
-    ports:
-      - "80:80"
-    volumes:
-      - ./public:/usr/share/caddy
