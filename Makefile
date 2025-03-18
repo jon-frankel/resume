@@ -35,9 +35,9 @@ pulumi-destroy: ## Destroy pulumi stack
 	rm -rf .pulumi
 	# Don't do pulumi stack delete because we want to keep the yaml file
 
-launch: docker-up pulumi-up ## Launch the app
-	@echo "App is running at http://localhost 🚀"
-	@open http://localhost
+launch: docker-up pulumi-up ## Bring Docker and Pulumi up and launch the app
+	@echo "App is running at http://resume-local.frankel.test.s3-website.localhost.localstack.cloud:4566 🚀"
+	@open http://resume-local.frankel.test.s3-website.localhost.localstack.cloud:4566
 
 destroy: pulumi-destroy docker-destroy ## Gracefully destroy all resources
 	@echo "Destroyed all resources 💥"
@@ -64,9 +64,7 @@ pytest: ## Run integration tests
 	cd .. && \
 	uv run pytest
 
-test-integration: pytest ## Run integration tests
-
 playwright: ## Run end-to-end tests
 	pnpm exec playwright test
 
-test-e2e: playwright
+test: pytest playwright ## Run all tests
