@@ -9,7 +9,7 @@ iniconfig==2.0.0
 packaging==24.2
 parver==0.5
 pluggy==1.5.0
-protobuf==4.25.6
+protobuf==4.25.8
 pulumi==3.155.0
 pulumi_archive==0.3.1
 pulumi_aws==6.72.0
