@@ -37,13 +37,13 @@ jobs:
       - name: Set up NodeJS
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version-file: true
 
       - name: Install npm dependencies
         run: npm install -g pnpm && pnpm install
 
       - name: Install the Python project
-        run: uv sync --all-extras --dev
+        run: uv sync --locked --all-extras --dev
 
       - name: Start containers
         run: make docker-up
@@ -54,7 +54,7 @@ jobs:
       - name: Run integration tests
         run: make pytest
 
-      - run: pnpx playwright install --with-deps
+      - run: pnpm exec playwright install --with-deps
 
       - name: Run Playwright tests
         run: pnpm exec playwright test
