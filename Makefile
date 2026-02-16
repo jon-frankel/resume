@@ -1,5 +1,5 @@
 ### ---------------------------------------------------------
-### This is the Makefile for the project.
+### This is the Makefile for managing local development.
 ### Below are the available commands and their descriptions.
 ### ---------------------------------------------------------
 
@@ -7,6 +7,17 @@
 help: ## Show this help.
 	@sed -ne '/@sed/!s/### //p' $(MAKEFILE_LIST)
 	@egrep -h '\s##\s' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+brew-install: ## Install system dependencies via homebrew
+	nvm --version || brew install nvm
+	nvm install && nvm use && npm install -g pnpm
+	uv --version || brew install uv
+	uv python install
+	pulumi version || brew install pulumi/tap/pulumi
+
+install-deps: ## Install nodejs and python dependencies
+	pnpm install
+	uv sync --locked --all-extras --dev
 
 docker-up: ## Start localstack in docker
 	docker compose up -d --build --wait
@@ -35,9 +46,9 @@ pulumi-destroy: ## Destroy pulumi stack
 	rm -rf .pulumi
 	# Don't do pulumi stack delete because we want to keep the yaml file
 
-launch: docker-up pulumi-up ## Launch the app
-	@echo "App is running at http://localhost 🚀"
-	@open http://localhost
+launch: docker-up pulumi-up ## Bring Docker and Pulumi up and launch the app
+	@echo "App is running at http://resume-local.frankel.test.s3-website.localhost.localstack.cloud:4566 🚀"
+	@open http://resume-local.frankel.test.s3-website.localhost.localstack.cloud:4566
 
 destroy: pulumi-destroy docker-destroy ## Gracefully destroy all resources
 	@echo "Destroyed all resources 💥"
@@ -64,9 +75,7 @@ pytest: ## Run integration tests
 	cd .. && \
 	uv run pytest
 
-test-integration: pytest ## Run integration tests
-
 playwright: ## Run end-to-end tests
 	pnpm exec playwright test
 
-test-e2e: playwright
+test: pytest playwright ## Run all tests
