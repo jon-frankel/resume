@@ -1,5 +1,5 @@
 ### ---------------------------------------------------------
-### This is the Makefile for the project.
+### This is the Makefile for managing local development.
 ### Below are the available commands and their descriptions.
 ### ---------------------------------------------------------
 
@@ -8,14 +8,14 @@ help: ## Show this help.
 	@sed -ne '/@sed/!s/### //p' $(MAKEFILE_LIST)
 	@egrep -h '\s##\s' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-brew-install: ## Install system dependencies via homebrew
+install: ## Install system and app dependencies
+	brew --version || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+	docker compose version || brew install --cask orbstack
 	nvm --version || brew install nvm
 	nvm install && nvm use && npm install -g pnpm
 	uv --version || brew install uv
 	uv python install
 	pulumi version || brew install pulumi/tap/pulumi
-
-install-deps: ## Install nodejs and python dependencies
 	pnpm install
 	uv sync --locked --all-extras --dev
 
