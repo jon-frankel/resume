@@ -8,12 +8,17 @@ html {
 body {
     margin: auto;
     width: 8.5in;
-    height: 11in;
+}
+
+.container {
+    width: 95%;
+    margin: 0 auto;
+    padding: 0 2.5%;
 }
 
 h1 {
     color: #FF4A00;
-    font-size: 4em;
+    font-size: 3.5em;
     line-height: 1em;
     letter-spacing: -4px;
     font-style: italic;
@@ -49,7 +54,6 @@ h4 {
 
 h5 {
     font-weight: bold;
-    /*display: inline;*/
     margin: 0;
 }
 
@@ -70,6 +74,7 @@ header ul, header li {
 }
 
 header ul {
+    padding-top: 8px;
     float: right;
 }
 
@@ -83,7 +88,8 @@ ul {
 }
 
 section ul {
-    width: 100%;
+    width: 90%;
+    padding: 0 5%;
 }
 
 h4 + ul {
