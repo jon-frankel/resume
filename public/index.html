@@ -77,15 +77,28 @@
 
     <ul>
         <li>
-            Set up a database to track error responses from a third party integration delivered via email
-            (Postgres, AWS Lambda/S3/SNS/SES)
+            AI Agent tooling: established internal Claude Code plugin marketplace and contributed a context management
+            skill for improved memory tracking per git branch; this resulted in better dev UX when juggling features
+            across multiple Claude Code sessions
         </li>
-        <li>Built out system to backfill resources that were not initially accepted by 3rd party integration</li>
-        <li>Set up Claude Code plugin marketplace; contributed context management skill for memory tracking</li>
-        <li>Built API and UI for user audit logs for enterprise customers (C#, MSSQL)</li>
-        <li>Supported authentication and authorization as part of the IAM team</li>
-        <li>Stood up GraphQL Federation using Apollo Gateway</li>
-        <li>Release manager rotation</li>
+        <li>
+            Developed Claude Code skills for GitHub and JIRA to supplement gaps in MCP servers, allowing
+            developers to pull in additional, external context for feature specification
+        </li>
+        <li>
+            Extended a system to ingest and parse error responses delivered via email from a third party integration
+            into structured data in Postgres for auditing; later used as the basis for replaying resource uploads,
+            to backfill missing data and support customer compliance with that integration (AWS Lambda/S3/SNS/SES)
+        </li>
+        <li>
+            Implemented the API and UI for user audit logs for enterprise customers (C#, MSSQL, React), delivering
+            the ability to track user activity for compliance and security requirements
+        </li>
+        <li>
+            AuthZ/AuthN enhancements as part of the IAM team;
+            deployed Apollo Gateway to enable GraphQL Federation;
+            served on release manager rotation for production deployments
+        </li>
     </ul>
 
     <h3>ActiveCampaign</h3>
