@@ -49,7 +49,7 @@ h3 {
 }
 
 h4 {
-    font-weight: normal;
+    font-weight: bolder;
     font-style: italic;
     margin: 5px 0 0 0;
     display: inline-block;
@@ -78,8 +78,9 @@ header ul, header li {
 }
 
 header ul {
-    padding-top: 8px;
+    padding-top: 7px;
     float: right;
+    padding-left: 1em;
 }
 
 header li {
@@ -166,7 +167,7 @@ ul.inline-dots li + li:before {
     padding: 0 1%;
     text-align: justify;
     font-style: italic;
-    font-weight: 1000;
+    font-weight: bolder;
     display: inline-block
 }
 
