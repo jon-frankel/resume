@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Jonathan Frankel's Résumé">
+    <meta name="keywords" content="Resume, Jonathan Frankel, Software Engineer">
+    <meta name="author" content="Jonathan Frankel">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JONATHAN FRANKEL</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300italic,600,700' rel='stylesheet' type='text/css'>
@@ -8,42 +13,57 @@
 </head>
 <body>
 
+<div class="container">
+
 <header>
     <h1 id="name">JONATHAN FRANKEL</h1>
     <ul id="contact-info">
-        <li id="phone">917.515.XXXX</li>
-        <li id="email">jon@****.***</li>
-        <li>linkedin.com/in/jonathan-frankel</li>
+        <li>jon@frankel.dev / 917.515.XXXX</li>
+        <li>
+            <a href="https://frankel.dev/linkedin" target="_blank" rel="noopener">frankel.dev/linkedin</a>
+            /
+            <a href="https://frankel.dev/resume" title="Project repo for this résumé" target="_blank" rel="noopener">frankel.dev/résumé</a>
+        </li>
     </ul>
 </header>
 
 <section class="highlights">
     <ul class="inline half">
-        <li>AWS</li>
-        <li>AuthN</li>
-        <li>AuthZ</li>
-        <li>JWT/JWKS</li>
-        <li>CI/CD</li>
-        <li>SQL</li>
-        <li>Docker</li>
-        <li>Kubernetes</li>
-        <li>Kafka</li>
-        <li>Agile/Scrum</li>
-        <li>BDD</li>
+        <li>
+            Full-stack senior software engineer with over 12 years of experience
+            building APIs and web applications for customer success.
+        </li>
     </ul>
-
     <ul class="inline half">
-        <li>Typescript</li>
-        <li>Python</li>
-        <li>PHP</li>
-        <li>C#</li>
-        <li>Laravel</li>
-        <li>Django</li>
-        <li>FastAPI</li>
-        <li>React</li>
-        <li>Express</li>
-        <li>OpenAPI</li>
-        <li>GraphQL</li>
+        <li>
+            <ul class="inline-dots">
+                <li>SQL</li>
+                <li>C#/.NET</li>
+                <li>Python</li>
+                <li>PHP</li>
+                <li>Typescript</li>
+            </ul>
+        </li>
+
+        <li>
+            <ul class="inline-dots">
+                <li>Laravel</li>
+                <li>FastAPI</li>
+                <li>Express</li>
+                <li>React</li>
+                <li>GraphQL</li>
+            </ul>
+        </li>
+
+        <li>
+            <ul class="inline-dots">
+                <li>AWS</li>
+                <li>CI/CD</li>
+                <li>Docker</li>
+                <li>Pulumi</li>
+                <li>Familiar: K8S, Kafka</li>
+            </ul>
+        </li>
     </ul>
 </section>
 
@@ -52,15 +72,33 @@
 
     <h4>
         <span class="left">Senior Software Engineer II</span>
-        <span class="right">February 2022 - Present</span>
+        <span class="right">February 2022 - February 2026</span>
     </h4>
 
     <ul>
-        <li>Developed enterprise features like UI for user audit logs</li>
-        <li>Improved permissions and authorization system in the main app</li>
-        <li>Implemented GraphQL Federation using Apollo Gateway
-        <li>Helped teams with architecture and schema for their federated GraphQL services</li>
-        <li>Release manager rotation</li>
+        <li>
+            AI Agent tooling: established internal Claude Code plugin marketplace and contributed a context management
+            skill for improved memory tracking per git branch; this resulted in better dev UX when juggling features
+            across multiple Claude Code sessions
+        </li>
+        <li>
+            Developed Claude Code skills for GitHub and JIRA to supplement gaps in MCP servers, allowing
+            developers to pull in additional, external context for feature specification
+        </li>
+        <li>
+            Extended a system to ingest and parse error responses delivered via email from a third party integration
+            into structured data in Postgres for auditing; later used as the basis for replaying resource uploads,
+            to backfill missing data and support customer compliance with that integration (AWS Lambda/S3/SNS/SES)
+        </li>
+        <li>
+            Implemented the API and UI for user audit logs for enterprise customers (C#, MSSQL, React), delivering
+            the ability to track user activity for compliance and security requirements
+        </li>
+        <li>
+            AuthZ/AuthN enhancements as part of the IAM team;
+            deployed Apollo Gateway to enable GraphQL Federation;
+            served on release manager rotation for production deployments
+        </li>
     </ul>
 
     <h3>ActiveCampaign</h3>
@@ -71,16 +109,26 @@
     </h4>
 
     <ul>
-        <li>Built service to capture event data into Kafka</li>
-        <li>Developed technical requirements for permissions and policy services to allow authz outside of monolith</li>
-        <li>Organized weekly testing parties to build out API contract tests</li>
-        <li>Helped develop Python API project template to improve Dev UX and productivity</li>
-        <li>Reduced time for historical sync of ecom data from days to minutes</li>
-        <li>Improved performance and observability of the API/ORM framework used by the main application</li>
-        <li>Helped design architecture for Zapier-like integration system</li>
-        <li>Helped implement CSRF protection for main legacy application</li>
-        <li>Presentations: dependency injection; active record vs data mapper ORM patterns; unit testing; switch statements consider harmful</li>
-        <li>Mentor junior developers</li>
+        <li>
+            Re-engineered system for syncing historical ecommerce data by leveraging batch processing, reducing sync
+            time from days to minutes, to accelerate customer onboarding
+        </li>
+        <li>
+            System hardening: implemented distributed tracing via custom request headers;
+            improved visibility into data loading and transformation via custom logging in MySQL;
+            Prototyped initial CSRF protection for the main application, which was used as the basis for legacy
+            subsystems
+        </li>
+        <li>
+            Architecture: Co-developed architecture for Zapier-like integration platform, used by third party
+            developers to build plugins for customers; extended serverless app to qualify and capture user interaction
+            events onto Kafka data stream
+        </li>
+        <li>
+            Mentored junior developers and delivered presentations on dependency injection, active record/ORM patterns,
+            unit testing, and coding best practices
+        </li>
+        <li>Led weekly testing parties to build API contract tests to avoid breaking changes to the API</li>
     </ul>
 
     <h3>Caxy Interactive</h3>
@@ -92,8 +140,11 @@
 
     <ul>
         <li>Product owner for a financial management application with a budget of $300k</li>
-        <li>Scope out requirements with clients, do user acceptance testing, negotiate alternative solutions where necessary</li>
-        <li>Lead developer for a camp registration site, a SPA using Symfony for REST API and Angularjs frontend</li>
+        <li>
+            Scoped out requirements with clients, performed user acceptance testing, negotiated alternative solutions
+            with the client where necessary
+        </li>
+        <li>Lead developer for a single-page camp registration application (PHP, MySQL, Angularjs)</li>
     </ul>
 
     <h4>
@@ -102,8 +153,8 @@
     </h4>
 
     <ul>
-        <li>Worked on a Symfony/Angularjs applications</li>
-        <li>Deployer (a Capistrano clone in PHP)</li>
+        <li>Developed Symfony/Angularjs applications</li>
+        <li>Release manager (Deployer, a Capistrano clone in PHP)</li>
     </ul>
 
     <div class="page-break"></div>
@@ -173,6 +224,8 @@
         <li>Systems/Hardware admin and support</li>
     </ul>
 </section>
+
+</div>
 
 <section class="no-print">
     <h5 class="right">Web counter: <span id="visits"></span> site visits</h5>
