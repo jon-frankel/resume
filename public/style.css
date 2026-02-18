@@ -16,6 +16,10 @@ body {
     padding: 0 2.5%;
 }
 
+a {
+    color: black;
+}
+
 h1 {
     color: #FF4A00;
     font-size: 3.5em;
@@ -109,7 +113,13 @@ ul.inline li {
     display: inline;
 }
 
-ul.inline li + li:before {
+ul.inline-dots {
+    width: 100%;
+    margin: 0;
+    padding-right: 0;
+}
+
+ul.inline-dots li + li:before {
     content: '  \2022\  ';
 }
 
@@ -124,12 +134,12 @@ ul.inline li + li:before {
 }
 
 .half {
-    width: 47.5%;
+    width: 49.5%;
     float: left;
 }
 
 .half + .half {
-    margin-left: 5%;
+    margin-left: 1%;
 }
 
 /* specific */
@@ -152,11 +162,11 @@ ul.inline li + li:before {
 }
 
 .highlights {
-    width: 95%;
-    padding: 10px 2.5%;
+    width: 98%;
+    padding: 0 1%;
     text-align: justify;
     font-style: italic;
-    font-weight: 300;
+    font-weight: 1000;
     display: inline-block
 }
 
