@@ -167,7 +167,6 @@ ul.inline-dots li + li:before {
     padding: 0 1%;
     text-align: justify;
     font-style: italic;
-    font-weight: bolder;
     display: inline-block
 }
 
