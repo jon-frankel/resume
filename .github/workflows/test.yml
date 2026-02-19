@@ -15,8 +15,15 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.51.0-noble
+      options: --user root -v /var/run/docker.sock:/var/run/docker.sock
     continue-on-error: false
     steps:
+      - name: Install Docker CLI
+        run: |
+          apt-get update
+          apt-get install -y docker.io
+          ln -s /usr/libexec/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
