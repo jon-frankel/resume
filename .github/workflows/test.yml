@@ -34,16 +34,15 @@ jobs:
         with:
           python-version-file: ".python-version"
 
-      - name: Set up NodeJS
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-
-      - name: Install npm dependencies
-        run: npm install -g pnpm && pnpm install
-
       - name: Install the Python project
         run: uv sync --locked --all-extras --dev
+
+      - name: Setup pnpm and install dependencies
+        uses: pnpm/action-setup@9b5745cdf0a2e8c2620f0746130f809adb911c19
+        with:
+          version: 10.6.1
+          run_install: true
+          cache: true
 
       - name: Start containers
         run: make docker-up
