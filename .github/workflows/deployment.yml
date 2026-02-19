@@ -97,7 +97,7 @@ jobs:
 
       - name: Run Playwright tests
         run: |
-          URL="https://$HOSTNAME"
+          export URL="https://$HOSTNAME"
           make playwright
 
       - uses: actions/upload-artifact@v4
