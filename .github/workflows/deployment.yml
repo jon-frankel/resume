@@ -24,6 +24,8 @@ jobs:
     name: Set URL
     runs-on: ubuntu-latest
     needs: status-update
+    outputs:
+      url: ${{ steps.url-output.outputs.URL }}
     if: ${{ github.event.deployment_status.state == 'success' }}
     steps:
       - name: Set URL for main
@@ -34,6 +36,10 @@ jobs:
         if: ${{ github.event.deployment.environment == 'wikiterra/jon-frankel-resume/production' }}
         run: echo "URL=https://resume.frankel.dev" >> "$GITHUB_ENV"
 
+      - name: Set URL as output
+        id: url-output
+        run: echo "URL=${{ env.URL }}" >> "$GITHUB_OUTPUT"
+
   purge-cache:
     name: Purge Cloudflare cache
     runs-on: ubuntu-latest
@@ -42,6 +48,7 @@ jobs:
     env:
       CLOUDFLARE_PURGE_CACHE_TOKEN: ${{ secrets.CLOUDFLARE_PURGE_CACHE_TOKEN }}
       CLOUDFLARE_ZONE: ${{ secrets.CLOUDFLARE_ZONE }}
+      URL: ${{ needs.set-url.outputs.url }}
     steps:
       - name: Purge Cloudflare cache
         run: |
@@ -53,24 +60,42 @@ jobs:
   smoke-test:
     name: Smoke test
     runs-on: ubuntu-latest
-    needs: purge-cache
+    needs: [set-url, purge-cache]
     if: ${{ github.event.deployment_status.state == 'success' }}
+    env:
+      URL: ${{ needs.set-url.outputs.url }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up NodeJS
-        uses: actions/setup-node@v4
+      - name: Setup pnpm and install dependencies
+        uses: pnpm/action-setup@9b5745cdf0a2e8c2620f0746130f809adb911c19
         with:
-          node-version-file: .nvmrc
+          version: 10.6.1
+          run_install: true
+          cache: true
 
-      - name: Install npm dependencies
-        run: npm install -g pnpm && pnpm install
+      - name: Get Playwright version
+        id: playwright-version
+        run: echo "PLAYWRIGHT_VERSION=$(pnpm list @playwright/test --depth=0 | grep @playwright/test | awk '{print $2}')" >> $GITHUB_ENV
 
-      - run: pnpm exec playwright install --with-deps
+      - name: Cache Playwright Binary
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+
+      - name: Install Playwright dependencies
+        run: pnpm exec playwright install-deps
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
 
       - name: Run Playwright tests
-        run: pnpm exec playwright test
+        run: make playwright
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
