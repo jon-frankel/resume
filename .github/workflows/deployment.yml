@@ -24,6 +24,7 @@ jobs:
     name: Set URL
     runs-on: ubuntu-latest
     needs: status-update
+    if: ${{ github.event.deployment_status.state == 'success' }}
     steps:
       - name: Set URL for main
         if: ${{ github.event.deployment.environment == 'wikiterra/jon-frankel-resume/staging' }}
@@ -47,7 +48,7 @@ jobs:
           curl -X POST "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE/purge_cache" \
             -H "Authorization: Bearer $CLOUDFLARE_PURGE_CACHE_TOKEN" \
             -H "Content-Type: application/json" \
-            -d '{"hosts": ["$URL"]}'
+            -d "{\"hosts\": [\"$URL\"]}"
 
   smoke-test:
     name: Smoke test
