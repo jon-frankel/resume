@@ -20,11 +20,26 @@ jobs:
 
       - name: Install pulumi
         uses: pulumi/actions@v4
-        with:
-          pulumi-version: 3.154.0
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker images
+        uses: actions/cache@v4
+        id: cache-docker
+        with:
+          path: ~/docker-cache
+          key: ${{ runner.os }}-docker-${{ hashFiles('docker-compose.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-docker-
+
+      - name: Load Docker images
+        run: |
+          if [ -f ~/docker-cache/localstack.tar ]; then
+            docker load -i ~/docker-cache/localstack.tar
+          else
+            docker pull localstack/localstack
+          fi
 
       - name: Install uv
         uses: astral-sh/setup-uv@v4
@@ -34,19 +49,43 @@ jobs:
         with:
           python-version-file: ".python-version"
 
-      - name: Set up NodeJS
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-
-      - name: Install npm dependencies
-        run: npm install -g pnpm && pnpm install
-
       - name: Install the Python project
         run: uv sync --locked --all-extras --dev
 
+      - name: Setup pnpm and install dependencies
+        uses: pnpm/action-setup@9b5745cdf0a2e8c2620f0746130f809adb911c19
+        with:
+          version: 10.6.1
+          run_install: true
+          cache: true
+
+      - name: Get Playwright version
+        id: playwright-version
+        run: echo "PLAYWRIGHT_VERSION=$(pnpm list @playwright/test --depth=0 | grep @playwright/test | awk '{print $2}')" >> $GITHUB_ENV
+
+      - name: Cache Playwright Binary
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+
+      - name: Install Playwright dependencies
+        run: pnpm exec playwright install-deps
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+
       - name: Start containers
         run: make docker-up
+
+      - name: Save Docker images
+        if: steps.cache-docker.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/docker-cache
+          docker save localstack/localstack -o ~/docker-cache/localstack.tar
 
       - name: Pulumi up
         run: make pulumi-up
@@ -54,10 +93,8 @@ jobs:
       - name: Run integration tests
         run: make pytest
 
-      - run: pnpm exec playwright install --with-deps
-
       - name: Run Playwright tests
-        run: pnpm exec playwright test
+        run: make playwright
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
