@@ -128,6 +128,28 @@ lambda_archive = archive.get_file(
     source_file="../api/main.py",
     output_path="api.zip",
 )
+# Lambda environment variables
+aws_config = pulumi.Config("aws")
+lambda_env_vars = {
+    "TABLE_NAME": visits_table.name,
+}
+
+# If we have explicit credentials or are in local stack, pass them to the lambda
+# This is mainly for MiniStack/LocalStack compatibility
+if aws_config.get("accessKey"):
+    lambda_env_vars["AWS_ACCESS_KEY_ID"] = aws_config.get("accessKey")
+if aws_config.get("secretKey"):
+    lambda_env_vars["AWS_SECRET_ACCESS_KEY"] = aws_config.get("secretKey")
+
+region = aws_config.get("region") or aws.get_region().name
+lambda_env_vars["AWS_REGION"] = region
+lambda_env_vars["AWS_DEFAULT_REGION"] = region
+
+# If we are running locally, we might need the endpoint URL
+if pulumi.get_stack() == "local":
+    # In local stack, we assume the gateway is at the standard port
+    lambda_env_vars["AWS_ENDPOINT_URL"] = "http://localhost:4566"
+
 lambda_function = aws.lambda_.Function(
     lambda_name,
     code=pulumi.FileArchive("api.zip"),
@@ -136,9 +158,7 @@ lambda_function = aws.lambda_.Function(
     handler="main.handler",
     source_code_hash=lambda_archive.output_base64sha256,
     runtime=aws.lambda_.Runtime.PYTHON3D13,
-    environment={"variables": {
-        "TABLE_NAME": visits_table.name,
-    }},
+    environment={"variables": lambda_env_vars},
     logging_config={"log_format": "Text"},
     opts=pulumi.ResourceOptions(depends_on=[log_policy_attachment, log_group]),
 )
@@ -196,7 +216,12 @@ bucket_policy = aws.s3.BucketPolicy(
 )
 
 def upload_files(api_url):
-    build_command = f"export LAMBDA_URL={api_url} && cd .. && pnpm install && pnpm build"
+    # For local development in MiniStack, we use the standard API invocation path
+    # as a relative URL to ensure routing works correctly without CORS issues.
+    if pulumi.get_stack() == "local":
+        api_url = f"/2015-03-31/functions/{lambda_name}/invocations"
+
+    build_command = f"export LAMBDA_URL='{api_url}' && cd .. && pnpm install && pnpm build"
     print(f"Running build command: {build_command}")
     exit_status = os.system(build_command)
     if exit_status > 0:
@@ -216,12 +241,20 @@ def upload_files(api_url):
         )
 
 # Once the lambda is created, we can use its URL to build the app and upload it to the bucket
-lambda_url.function_url.apply(upload_files)
+def get_final_url(url: str) -> str:
+    # MiniStack (and LocalStack) Function URLs can be tricky with Host headers.
+    # The standard API invocation path is more reliable for local dev.
+    if "on.aws" in url and ("localhost" in url or "127.0.0.1" in url or "localstack.cloud" in url):
+        return f"http://localhost:4566/2015-03-31/functions/{lambda_name}/invocations"
+    return url
+
+invocable_url = lambda_url.function_url.apply(get_final_url)
+invocable_url.apply(upload_files)
 
 pulumi.export("bucket_name", bucket_name)
 pulumi.export("bucket_bucket", bucket.bucket)
 pulumi.export("website_url", website.website_endpoint)
 pulumi.export("website_domain", website.website_domain)
 pulumi.export("lambda_name", lambda_function.name)
-pulumi.export("lambda_url", lambda_url.function_url)
+pulumi.export("lambda_url", invocable_url)
 pulumi.export("visits_table_name", visits_table.name)

@@ -41,8 +41,8 @@ A more minor reason is that Cloudflare has a free tier for DNS management, unlik
 
 ## Local Development
 
-To support local versions of S3, DynamoDB, and Lambda, this project uses Localstack running
-[inside Docker](docker-compose.yml). The same Pulumi that deploys to AWS also deploys to Localstack,
+To support local versions of S3, DynamoDB, and Lambda, this project uses MiniStack running
+[inside Docker](docker-compose.yml). The same Pulumi that deploys to AWS also deploys to MiniStack,
 just with a [different YAML config file](pulumi/Pulumi.local.yaml).
 
 If you want to run the project locally yourself, you can use the [Makefile](Makefile). Use `make help`
@@ -53,19 +53,19 @@ make install
 make launch
 ```
 
-This will start Localstack and deploy via Pulumi. Use `make destroy` to tear everything down.
+This will start MiniStack and deploy via Pulumi. Use `make destroy` to tear everything down.
 
 ## Tests
 
 Python integration tests use [Pytest](api/integration_tests/test_main.py).
 There are also Playwright [end-to-end tests](e2e/index.spec.ts) to validate the UI.
 
-Both test suites depend on the app running locally in Localstack.
+Both test suites depend on the app running locally in MiniStack.
 
 ## CI/CD
 
 Pull requests require tests to pass before they can be merged. The [test workflow](.github/workflows/test.yml)
-uses Pulumi to deploy the app to Localstack and runs the integration and end-to-end tests. There is also
+uses Pulumi to deploy the app to MiniStack and runs the integration and end-to-end tests. There is also
 an integration between Pulumi and GitHub that previews changes to the staging environment.
 
 Merging into develop triggers a deployment to the staging environment, which is managed in Pulumi. The

@@ -19,15 +19,14 @@ install: ## Install system and app dependencies
 	pnpm install
 	uv sync --locked --all-extras --dev
 
-docker-up: ## Start localstack in docker
+docker-up: ## Start ministack in docker
 	docker compose up -d --build --wait
 
-docker-destroy: ## Stop and remove localstack
+docker-destroy: ## Stop and remove ministack
 	docker compose down
-	docker compose rm localstack
-	rm -rf .localstack
+	docker compose rm ministack
 
-pulumi-up: ## Deploy pulumi stack to localstack
+pulumi-up: ## Deploy pulumi stack to ministack
 	cd pulumi && \
 	export PULUMI_CONFIG_PASSPHRASE=local && \
 	export PULUMI_BACKEND_URL=file://.pulumi && \
@@ -47,8 +46,8 @@ pulumi-destroy: ## Destroy pulumi stack
 	# Don't do pulumi stack delete because we want to keep the yaml file
 
 launch: docker-up pulumi-up ## Bring Docker and Pulumi up and launch the app
-	@echo "App is running at http://resume-local.frankel.test.s3-website.localhost.localstack.cloud:4566 🚀"
-	@open http://resume-local.frankel.test.s3-website.localhost.localstack.cloud:4566
+	@echo "App is running at http://resume-local.frankel.test.s3-website.localhost:4566/index.html 🚀"
+	@open http://resume-local.frankel.test.s3-website.localhost:4566/index.html
 
 destroy: pulumi-destroy docker-destroy ## Gracefully destroy all resources
 	@echo "Destroyed all resources 💥"

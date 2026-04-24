@@ -35,10 +35,10 @@ jobs:
 
       - name: Load Docker images
         run: |
-          if [ -f ~/docker-cache/localstack.tar ]; then
-            docker load -i ~/docker-cache/localstack.tar
+          if [ -f ~/docker-cache/ministack.tar ]; then
+            docker load -i ~/docker-cache/ministack.tar
           else
-            docker pull localstack/localstack
+            docker pull ministackorg/ministack
           fi
 
       - name: Install uv
@@ -85,7 +85,7 @@ jobs:
         if: steps.cache-docker.outputs.cache-hit != 'true'
         run: |
           mkdir -p ~/docker-cache
-          docker save localstack/localstack -o ~/docker-cache/localstack.tar
+          docker save ministackorg/ministack -o ~/docker-cache/ministack.tar
 
       - name: Pulumi up
         run: make pulumi-up

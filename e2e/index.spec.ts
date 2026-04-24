@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
 
-// Localstack does not actually return the URL for the s3 site, but this it.
-const localstackUrl = 'http://resume-local.frankel.test.s3-website.localhost.localstack.cloud:4566';
+// Ministack does not actually return the URL for the s3 site, but this it.
+const ministackUrl = 'http://resume-local.frankel.test.s3-website.localhost:4566/index.html';
 
-const host = process.env.URL ?? localstackUrl;
+const host = process.env.URL ?? ministackUrl;
 console.log("Testing host: ", host);
 
 test('page contains name', async ({ page }) => {
