@@ -9,15 +9,7 @@ help: ## Show this help.
 	@egrep -h '\s##\s' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 install: ## Install system and app dependencies
-	brew --version || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-	docker compose version || brew install --cask orbstack
-	nvm --version || brew install nvm
-	nvm install && nvm use && npm install -g pnpm
-	uv --version || brew install uv
-	uv python install
-	pulumi version || brew install pulumi/tap/pulumi
-	pnpm install
-	uv sync --locked --all-extras --dev
+	./scripts/install.zsh
 
 docker-up: ## Start ministack in docker
 	docker compose up -d --build --wait
