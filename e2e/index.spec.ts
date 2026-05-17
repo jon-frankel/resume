@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-// Ministack does not actually return the URL for the s3 site, but this it.
-const ministackUrl = 'http://resume-local.frankel.test.s3-website.localhost:4566/index.html';
+// MiniStack S3 static site using path-style URLs (aws:s3UsePathStyle: true in Pulumi.local.yaml)
+const ministackUrl = 'http://localhost:4566/resume-local.frankel.test/index.html';
 
 const host = process.env.URL ?? ministackUrl;
 console.log("Testing host: ", host);
