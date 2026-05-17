@@ -244,7 +244,7 @@ def upload_files(api_url):
 def get_final_url(url: str) -> str:
     # MiniStack (and LocalStack) Function URLs can be tricky with Host headers.
     # The standard API invocation path is more reliable for local dev.
-    if "on.aws" in url and ("localhost" in url or "127.0.0.1" in url or "localstack.cloud" in url):
+    if pulumi.get_stack() == "local":
         return f"http://localhost:4566/2015-03-31/functions/{lambda_name}/invocations"
     return url
 
