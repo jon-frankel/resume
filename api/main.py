@@ -1,19 +1,9 @@
 import os
 import time
-import json
 import boto3
 
 def get_dynamodb():
-    params = {}
-    if os.environ.get("AWS_ENDPOINT_URL"):
-        params["endpoint_url"] = os.environ.get("AWS_ENDPOINT_URL")
-    if os.environ.get("AWS_ACCESS_KEY_ID"):
-        params["aws_access_key_id"] = os.environ.get("AWS_ACCESS_KEY_ID")
-    if os.environ.get("AWS_SECRET_ACCESS_KEY"):
-        params["aws_secret_access_key"] = os.environ.get("AWS_SECRET_ACCESS_KEY")
-    if os.environ.get("AWS_REGION"):
-        params["region_name"] = os.environ.get("AWS_REGION")
-    return boto3.resource("dynamodb", **params)
+    return boto3.resource("dynamodb")
 
 
 dynamodb = get_dynamodb()
