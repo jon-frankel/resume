@@ -17,6 +17,7 @@ docker-up: ## Start ministack in docker
 docker-destroy: ## Stop and remove ministack
 	docker compose down
 	docker compose rm ministack
+	rm -rf .ministack
 
 pulumi-up: ## Deploy pulumi stack to ministack
 	cd pulumi && \
@@ -38,8 +39,8 @@ pulumi-destroy: ## Destroy pulumi stack
 	# Don't do pulumi stack delete because we want to keep the yaml file
 
 launch: docker-up pulumi-up ## Bring Docker and Pulumi up and launch the app
-	@echo "App is running at http://resume-local.frankel.test.s3-website.localhost:4566/index.html 🚀"
-	@open http://resume-local.frankel.test.s3-website.localhost:4566/index.html
+	@echo "App is running at http://localhost:4566/resume-local.frankel.test/index.html 🚀"
+	@open http://localhost:4566/resume-local.frankel.test/index.html
 
 destroy: pulumi-destroy docker-destroy ## Gracefully destroy all resources
 	@echo "Destroyed all resources 💥"
