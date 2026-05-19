@@ -17,9 +17,11 @@ def test_main():
 
 
 def get_response():
-    req = requests.get(LAMBDA_URL)
+    # Lambda Invoke API requires POST. Function URLs also support POST.
+    req = requests.post(LAMBDA_URL, json={})
     assert req.status_code == 200
     data = req.json()
+
     assert "visits" in data
     visits = data["visits"]
     assert "timestamp" in data
