@@ -3,7 +3,7 @@ import time
 import boto3
 
 def get_dynamodb():
-    return boto3.resource("dynamodb", endpoint_url=os.environ.get("AWS_ENDPOINT_URL"))
+    return boto3.resource("dynamodb")
 
 
 dynamodb = get_dynamodb()
