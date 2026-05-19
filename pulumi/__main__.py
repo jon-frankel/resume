@@ -154,20 +154,19 @@ lambda_env_vars = {
     "TABLE_NAME": visits_table.name,
 }
 
-# If we have explicit credentials or are in local stack, pass them to the lambda
-# This is mainly for MiniStack/LocalStack compatibility
-if aws_config.get("accessKey"):
-    lambda_env_vars["AWS_ACCESS_KEY_ID"] = aws_config.get("accessKey")
-if aws_config.get("secretKey"):
-    lambda_env_vars["AWS_SECRET_ACCESS_KEY"] = aws_config.get("secretKey")
-
-region = aws_config.get("region") or aws.get_region().name
-lambda_env_vars["AWS_REGION"] = region
-lambda_env_vars["AWS_DEFAULT_REGION"] = region
-
-# If we are running locally, we need the endpoint URL for the AWS SDK
+# If we are running locally, we need to pass additional configuration to the lambda
+# so it can find the local gateway and use the correct credentials/region.
 if local_gateway_url:
     lambda_env_vars["AWS_ENDPOINT_URL"] = local_gateway_url
+    
+    if aws_config.get("accessKey"):
+        lambda_env_vars["AWS_ACCESS_KEY_ID"] = aws_config.get("accessKey")
+    if aws_config.get("secretKey"):
+        lambda_env_vars["AWS_SECRET_ACCESS_KEY"] = aws_config.get("secretKey")
+
+    region = aws_config.get("region") or aws.get_region().name
+    lambda_env_vars["AWS_REGION"] = region
+    lambda_env_vars["AWS_DEFAULT_REGION"] = region
 
 lambda_function = aws.lambda_.Function(
     lambda_name,
