@@ -10,6 +10,20 @@ stack_config = pulumi.Config()
 target_domain = stack_config.require("targetDomain")
 lambda_name = "web-counter-lambda"
 
+
+def resolve_local_gateway_url() -> str:
+    """Resolve local gateway URL from Pulumi aws:endpoints, with sane fallback."""
+    endpoints = aws_config.get_object("endpoints") or []
+    for endpoint in endpoints:
+        if isinstance(endpoint, dict) and endpoint.get("lambda"):
+            return str(endpoint["lambda"]).rstrip("/")
+
+    for endpoint in endpoints:
+        if isinstance(endpoint, dict) and endpoint.get("s3"):
+            return str(endpoint["s3"]).rstrip("/")
+
+    raise RuntimeError("Could not resolve local gateway URL from Pulumi aws:endpoints")
+
 # Lambda role
 assume_role = aws.iam.get_policy_document(
     statements=[
@@ -128,6 +142,32 @@ lambda_archive = archive.get_file(
     source_file="../api/main.py",
     output_path="api.zip",
 )
+# Lambda environment variables
+aws_config = pulumi.Config("aws")
+
+# Only resolve local gateway if we are in the local stack
+local_gateway_url = None
+if pulumi.get_stack() == "local":
+    local_gateway_url = resolve_local_gateway_url()
+
+lambda_env_vars = {
+    "TABLE_NAME": visits_table.name,
+}
+
+# If we are running locally, we need to pass additional configuration to the lambda
+# so it can find the local gateway and use the correct credentials/region.
+if local_gateway_url:
+    lambda_env_vars["AWS_ENDPOINT_URL"] = local_gateway_url
+    
+    if aws_config.get("accessKey"):
+        lambda_env_vars["AWS_ACCESS_KEY_ID"] = aws_config.get("accessKey")
+    if aws_config.get("secretKey"):
+        lambda_env_vars["AWS_SECRET_ACCESS_KEY"] = aws_config.get("secretKey")
+
+    region = aws_config.get("region") or aws.get_region().name
+    lambda_env_vars["AWS_REGION"] = region
+    lambda_env_vars["AWS_DEFAULT_REGION"] = region
+
 lambda_function = aws.lambda_.Function(
     lambda_name,
     code=pulumi.FileArchive("api.zip"),
@@ -136,9 +176,7 @@ lambda_function = aws.lambda_.Function(
     handler="main.handler",
     source_code_hash=lambda_archive.output_base64sha256,
     runtime=aws.lambda_.Runtime.PYTHON3D13,
-    environment={"variables": {
-        "TABLE_NAME": visits_table.name,
-    }},
+    environment={"variables": lambda_env_vars},
     logging_config={"log_format": "Text"},
     opts=pulumi.ResourceOptions(depends_on=[log_policy_attachment, log_group]),
 )
@@ -196,7 +234,7 @@ bucket_policy = aws.s3.BucketPolicy(
 )
 
 def upload_files(api_url):
-    build_command = f"export LAMBDA_URL={api_url} && cd .. && pnpm install && pnpm build"
+    build_command = f"export LAMBDA_URL='{api_url}' && cd .. && pnpm install && pnpm build"
     print(f"Running build command: {build_command}")
     exit_status = os.system(build_command)
     if exit_status > 0:
@@ -216,12 +254,22 @@ def upload_files(api_url):
         )
 
 # Once the lambda is created, we can use its URL to build the app and upload it to the bucket
-lambda_url.function_url.apply(upload_files)
+# Note: lambda_url.function_url is the idiomatic way to get the full URL in Pulumi.
+# For local dev in MiniStack, we use the standard API invocation path because 
+# MiniStack's Function URL routing can be unreliable via the path-based gateway.
+invocable_url = lambda_url.function_url
+if local_gateway_url:
+    invocable_url = pulumi.Output.from_input(
+        f"{local_gateway_url}/2015-03-31/functions/{lambda_name}/invocations"
+    )
+
+invocable_url.apply(upload_files)
 
 pulumi.export("bucket_name", bucket_name)
 pulumi.export("bucket_bucket", bucket.bucket)
 pulumi.export("website_url", website.website_endpoint)
 pulumi.export("website_domain", website.website_domain)
 pulumi.export("lambda_name", lambda_function.name)
-pulumi.export("lambda_url", lambda_url.function_url)
+pulumi.export("lambda_url", invocable_url)
+pulumi.export("raw_lambda_url", lambda_url.function_url)
 pulumi.export("visits_table_name", visits_table.name)

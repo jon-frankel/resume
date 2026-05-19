@@ -3,12 +3,25 @@ import time
 import json
 import boto3
 
-dynamodb = boto3.resource("dynamodb")
+def get_dynamodb():
+    params = {}
+    if os.environ.get("AWS_ENDPOINT_URL"):
+        params["endpoint_url"] = os.environ.get("AWS_ENDPOINT_URL")
+    if os.environ.get("AWS_ACCESS_KEY_ID"):
+        params["aws_access_key_id"] = os.environ.get("AWS_ACCESS_KEY_ID")
+    if os.environ.get("AWS_SECRET_ACCESS_KEY"):
+        params["aws_secret_access_key"] = os.environ.get("AWS_SECRET_ACCESS_KEY")
+    if os.environ.get("AWS_REGION"):
+        params["region_name"] = os.environ.get("AWS_REGION")
+    return boto3.resource("dynamodb", **params)
+
+
+dynamodb = get_dynamodb()
 table = dynamodb.Table(os.environ["TABLE_NAME"])
-timestamp = int(time.time())
 
 
 def increment_counter(pk ="web_counter"):
+    timestamp = int(time.time())
     try:
         response = table.update_item(
             Key={"id": pk},
@@ -18,7 +31,7 @@ def increment_counter(pk ="web_counter"):
         )
         return {
             "status": "success",
-            "visits": f"{response["Attributes"]["visits"]}",
+            "visits": int(response["Attributes"]["visits"]),
             "timestamp": timestamp,
         }
     except Exception as e:
@@ -26,28 +39,12 @@ def increment_counter(pk ="web_counter"):
         return {
             "status": "error",
             "message": "Could not increment counter",
-            "visits": None,
+            "visits": 0,
             "timestamp": timestamp,
         }
 
 
 def handler(event=None, _context=None):
-    method = event["requestContext"]["http"]["method"]
-    if method == "OPTIONS":
-        return {
-            "statusCode": 200,
-            "headers": {
-                "Content-Type": "application/json",
-            },
-            "body": json.dumps({"status": "success"}),
-        }
-
-    response_body = increment_counter()
-
-    return {
-        "statusCode": 200,
-        "headers": {
-            "Content-Type": "application/json",
-        },
-        "body": json.dumps(response_body),
-    }
+    # AWS Function URL and MiniStack handles CORS via configuration,
+    # and the Invoke API returns our response payload directly.
+    return increment_counter()

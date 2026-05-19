@@ -9,25 +9,17 @@ help: ## Show this help.
 	@egrep -h '\s##\s' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 install: ## Install system and app dependencies
-	brew --version || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-	docker compose version || brew install --cask orbstack
-	nvm --version || brew install nvm
-	nvm install && nvm use && npm install -g pnpm
-	uv --version || brew install uv
-	uv python install
-	pulumi version || brew install pulumi/tap/pulumi
-	pnpm install
-	uv sync --locked --all-extras --dev
+	./scripts/install.zsh
 
-docker-up: ## Start localstack in docker
+docker-up: ## Start ministack in docker
 	docker compose up -d --build --wait
 
-docker-destroy: ## Stop and remove localstack
+docker-destroy: ## Stop and remove ministack
 	docker compose down
-	docker compose rm localstack
-	rm -rf .localstack
+	docker compose rm ministack
+	rm -rf .ministack
 
-pulumi-up: ## Deploy pulumi stack to localstack
+pulumi-up: ## Deploy pulumi stack to ministack
 	cd pulumi && \
 	export PULUMI_CONFIG_PASSPHRASE=local && \
 	export PULUMI_BACKEND_URL=file://.pulumi && \
@@ -47,8 +39,8 @@ pulumi-destroy: ## Destroy pulumi stack
 	# Don't do pulumi stack delete because we want to keep the yaml file
 
 launch: docker-up pulumi-up ## Bring Docker and Pulumi up and launch the app
-	@echo "App is running at http://resume-local.frankel.test.s3-website.localhost.localstack.cloud:4566 🚀"
-	@open http://resume-local.frankel.test.s3-website.localhost.localstack.cloud:4566
+	@echo "App is running at http://localhost:4566/resume-local.frankel.test/index.html 🚀"
+	@open http://localhost:4566/resume-local.frankel.test/index.html
 
 destroy: pulumi-destroy docker-destroy ## Gracefully destroy all resources
 	@echo "Destroyed all resources 💥"

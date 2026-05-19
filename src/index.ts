@@ -1,12 +1,15 @@
-const {LAMBDA_URL} = process.env;
+const LAMBDA_URL = process.env.LAMBDA_URL || '';
 
 type ResponseBody = {
     visits: number;
-    timestamp: string;
+    timestamp: number;
 };
 
 export const handler = async (): Promise<ResponseBody> => {
-    const response = await fetch(LAMBDA_URL);
+    const response = await fetch(LAMBDA_URL, {
+        method: 'POST',
+        body: JSON.stringify({})
+    });
     return await response?.json();
 };
 
@@ -14,7 +17,8 @@ export const handler = async (): Promise<ResponseBody> => {
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const data = await handler();
-        document.getElementById('visits').innerText = data.visits.toString();
+        const visitsElement = document.getElementById('visits');
+        visitsElement.innerText = data.visits.toString();
     } catch (error) {
         console.error('Error fetching data', error);
     }

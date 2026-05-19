@@ -5,17 +5,19 @@ description = "Jonathan Frankel's Resume"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "boto3-stubs~=1.37.11",
+    "boto3==1.43.9",
+    "boto3-stubs==1.43.9",
 ]
 
 [dependency-groups]
 dev = [
-    "boto3>=1.37.11",
-    "pulumi>=3.154.0",
-    "pulumi-archive>=0.3.1",
-    "pulumi-aws>=6.71.0",
-    "pytest>=9.0.2",
-    "pytest-dotenv>=0.5.2",
-    "requests>=2.32.5",
-    "ruff>=0.9.10",
+    "boto3==1.43.9",
+    "pulumi==3.241.0",
+    "pulumi-archive==0.4.0",
+    "pulumi-aws==6.83.2",
+    "pytest==9.0.3",
+    "pytest-dotenv==0.5.2",
+    "requests==2.34.1",
+    "ruff==0.15.12",
+    "urllib3==2.6.3",
 ]
